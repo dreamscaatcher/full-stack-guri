@@ -1,4 +1,4 @@
-import { PrismaClient, UserSex } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -57,7 +57,7 @@ async function main() {
       phone: '1234567890',
       address: '123 School Street',
       bloodType: 'A+',
-      sex: UserSex.MALE,
+      sex: 'MALE',
       birthday: new Date('1980-01-01'),
       subjects: {
         connect: [{ id: mathSubject.id }, { id: scienceSubject.id }],
@@ -92,7 +92,7 @@ async function main() {
       phone: '1122334455',
       address: '456 Parent Avenue',
       bloodType: 'B+',
-      sex: UserSex.MALE,
+      sex: 'MALE',
       birthday: new Date('2010-05-15'),
       parentId: parent.id,
       classId: class1A.id,

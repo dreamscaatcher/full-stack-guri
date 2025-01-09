@@ -22,6 +22,10 @@ services:
      - DATABASE_URL=postgresql://lamadev:1234@postgres:5432/school
      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_aW50ZXJuYWwtcGVnYXN1cy01My5jbGVyay5hY2NvdW50cy5kZXYk
      - CLERK_SECRET_KEY=sk_test_WXiP3lDAo9ZwTqxTIALn7REvETPcf7REipRF0XQ7TI
+     - NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+     - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dgvizgqs3
+     - NEXT_PUBLIC_CLOUDINARY_API_KEY=254766822525643
+     - CLOUDINARY_API_SECRET=-GuJab7Pp-P2QmYw9RS6PKIuBw0
    depends_on:
      - postgres
 

@@ -8,7 +8,6 @@ import { Announcement, Class, Prisma } from "@prisma/client";
 import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 
-
 type AnnouncementList = Announcement & { class: Class };
 const AnnouncementListPage = async ({
   searchParams,
@@ -71,7 +70,6 @@ const AnnouncementListPage = async ({
   const p = page ? parseInt(page) : 1;
 
   // URL PARAMS CONDITION
-
   const query: Prisma.AnnouncementWhereInput = {};
 
   if (queryParams) {
@@ -79,7 +77,7 @@ const AnnouncementListPage = async ({
       if (value !== undefined) {
         switch (key) {
           case "search":
-            query.title = { contains: value, mode: "insensitive" };
+            query.title = { contains: value };
             break;
           default:
             break;
@@ -89,7 +87,6 @@ const AnnouncementListPage = async ({
   }
 
   // ROLE CONDITIONS
-
   const roleConditions = {
     teacher: { lessons: { some: { teacherId: currentUserId! } } },
     student: { students: { some: { id: currentUserId! } } },

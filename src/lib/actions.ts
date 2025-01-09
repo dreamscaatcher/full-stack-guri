@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   ClassSchema,
   ExamSchema,
+  EventSchema,
   StudentSchema,
   SubjectSchema,
   TeacherSchema,
@@ -460,6 +461,69 @@ export const deleteExam = async (
     });
 
     // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const createEvent = async (
+  currentState: CurrentState,
+  data: EventSchema
+) => {
+  try {
+    const startDateTime = new Date(data.date);
+    const endDateTime = new Date(data.date);
+    const [startHours, startMinutes] = data.startTime.split(':');
+    const [endHours, endMinutes] = data.endTime.split(':');
+    
+    startDateTime.setHours(parseInt(startHours), parseInt(startMinutes));
+    endDateTime.setHours(parseInt(endHours), parseInt(endMinutes));
+
+    await prisma.event.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        startTime: startDateTime,
+        endTime: endDateTime,
+      },
+    });
+
+    revalidatePath("/list/events");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateEvent = async (
+  currentState: CurrentState,
+  data: EventSchema
+) => {
+  try {
+    const startDateTime = new Date(data.date);
+    const endDateTime = new Date(data.date);
+    const [startHours, startMinutes] = data.startTime.split(':');
+    const [endHours, endMinutes] = data.endTime.split(':');
+    
+    startDateTime.setHours(parseInt(startHours), parseInt(startMinutes));
+    endDateTime.setHours(parseInt(endHours), parseInt(endMinutes));
+
+    await prisma.event.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        description: data.description,
+        startTime: startDateTime,
+        endTime: endDateTime,
+      },
+    });
+
+    revalidatePath("/list/events");
     return { success: true, error: false };
   } catch (err) {
     console.log(err);

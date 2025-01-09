@@ -10,17 +10,41 @@ const matchers = Object.keys(routeAccessMap).map((route) => ({
 console.log(matchers);
 
 export default clerkMiddleware((auth, req) => {
-  // if (isProtectedRoute(req)) auth().protect()
+  // Skip auth check for sign-in page and static assets
+  if (req.nextUrl.pathname.startsWith('/sign-in') || 
+      req.nextUrl.pathname.startsWith('/_next') ||
+      req.nextUrl.pathname.startsWith('/favicon.ico')) {
+    return NextResponse.next();
+  }
 
-  const { sessionClaims } = auth();
+  const { userId, sessionClaims } = auth();
+
+  // If not authenticated and not on sign-in page, redirect to sign-in
+  if (!userId && !req.nextUrl.pathname.startsWith('/sign-in')) {
+    return NextResponse.redirect(new URL('/sign-in', req.url));
+  }
 
   const role = (sessionClaims?.public_Meta_data as { role?: string })?.role;
 
-  for (const { matcher, allowedRoles } of matchers) {
-    if (matcher(req) && allowedRoles.includes(role!)) {
-      return NextResponse.redirect(new URL(`/${role}`, req.url));
+  // If authenticated but no role, allow access to home page only
+  if (userId && !role && req.nextUrl.pathname === '/') {
+    return NextResponse.next();
+  }
+
+  // Check role-based access
+  if (role) {
+    for (const { matcher, allowedRoles } of matchers) {
+      if (matcher(req) && allowedRoles.includes(role)) {
+        // Only redirect if not already on a role-specific path
+        if (!req.nextUrl.pathname.startsWith(`/${role}`)) {
+          return NextResponse.redirect(new URL(`/${role}`, req.url));
+        }
+        return NextResponse.next();
+      }
     }
   }
+
+  return NextResponse.next();
 });
 
 export const config = {

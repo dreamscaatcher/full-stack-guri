@@ -1,12 +1,13 @@
-import FormContainer from "@/lib/settings";;;;;;;
-import Pagination from "@/lib/settings";;;;;;;
-import Table from "@/lib/settings";;;;;;;
-import TableSearch from "@/lib/settings";;;;;;;
-import prisma from "@/lib/settings";;;;;;;
-import { ITEM_PER_PAGE } from "@/lib/settings";;;;;;;
-import { Announcement, Class, Prisma } from "@/lib/settings";;;;;;
-import Image from "@/lib/settings";;;;;;
-import { auth } from "@/lib/settings";;;;;;
+import FormContainer from "@/components/FormContainer";
+import Pagination from "@/components/Pagination";
+import Table from "@/components/Table";
+import TableSearch from "@/components/TableSearch";
+import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
+import { Announcement, Class, Prisma } from "@prisma/client";
+import Image from "next/image";
+import { auth } from "@clerk/nextjs/server";
+
 
 type AnnouncementList = Announcement & { class: Class };
 const AnnouncementListPage = async ({
@@ -14,6 +15,7 @@ const AnnouncementListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
+  
   const { userId, sessionClaims } = auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
   const currentUserId = userId;
@@ -69,6 +71,7 @@ const AnnouncementListPage = async ({
   const p = page ? parseInt(page) : 1;
 
   // URL PARAMS CONDITION
+
   const query: Prisma.AnnouncementWhereInput = {};
 
   if (queryParams) {
@@ -76,7 +79,7 @@ const AnnouncementListPage = async ({
       if (value !== undefined) {
         switch (key) {
           case "search":
-            query.title = { contains: value };
+            query.title = { contains: value, mode: "insensitive" };
             break;
           default:
             break;
@@ -86,6 +89,7 @@ const AnnouncementListPage = async ({
   }
 
   // ROLE CONDITIONS
+
   const roleConditions = {
     teacher: { lessons: { some: { teacherId: currentUserId! } } },
     student: { students: { some: { id: currentUserId! } } },

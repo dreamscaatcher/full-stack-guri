@@ -1,34 +1,26 @@
-# Use Node.js as the base image
-FROM node:18
+# Use Node.js as the base image - we're using Alpine for its small size
+FROM node:18-alpine
 
-# Set the working directory inside the container
+# Set up the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json files
+# Copy package files first - this helps with Docker caching
 COPY package*.json ./
 
-# Install dependencies
+# Install all dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy all project files to the container
 COPY . .
 
-# Install netcat for postgres readiness check
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+# Generate the Prisma client - this is needed for your database operations
+RUN npx prisma generate
 
-# Build the Next.js application
+# Build your Next.js application
 RUN npm run build
 
-# Copy entrypoint script
-COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
-
-# Expose the port the app runs on
+# The port your application will run on
 EXPOSE 3000
 
-# Start the application using the entrypoint script
-CMD ["./docker-entrypoint.sh"]
-
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_Z3Jvd24tZ2FyLTc3LmNsZXJrLmFjY291bnRzLmRldiQ
-ENV CLERK_SECRET_KEY=sk_test_98Wr1lkyEdsJ8sxdcc8ctP8GmUvfDITLZy2cObXyvZ
-ENV DATABASE_URL=postgresql://lamadev:1234@postgres:5432/school
+# Start the application
+CMD ["npm", "start"]

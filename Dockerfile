@@ -1,25 +1,28 @@
-# Use Node.js as the base image - we're using Alpine for its small size
+# Use Node.js as the base image
 FROM node:18-alpine
 
-# Set up the working directory in the container
+# Install the required dependencies for Prisma
+RUN apk add --no-cache openssl1.1-compat
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package files first - this helps with Docker caching
+# Copy package.json and package-lock.json files
 COPY package*.json ./
 
-# Install all dependencies
+# Install dependencies
 RUN npm install
 
-# Copy all project files to the container
+# Copy the rest of the application code
 COPY . .
 
-# Generate the Prisma client - this is needed for your database operations
+# Generate Prisma client
 RUN npx prisma generate
 
-# Build your Next.js application
+# Build the Next.js application
 RUN npm run build
 
-# The port your application will run on
+# Expose the port the app runs on
 EXPOSE 3000
 
 # Start the application

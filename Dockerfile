@@ -1,8 +1,10 @@
 # Use Node.js as the base image
 FROM node:18-alpine
 
-# Install the required dependencies for Prisma
-RUN apk add --no-cache openssl1.1-compat
+# Install OpenSSL and other required system dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -16,7 +18,8 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client with proper environment variables
+ENV PRISMA_BINARY_TARGET="linux-musl"
 RUN npx prisma generate
 
 # Build the Next.js application
